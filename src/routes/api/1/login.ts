@@ -1,0 +1,56 @@
+const router = require("express").Router();
+import {celebrate, errors, Joi} from "celebrate";
+
+import {ensureToken} from '@root/controllers/authentification';
+import {MyError} from "@root/classes/MyError";
+import User from '@models/User';
+
+
+router.post('/register', celebrate({
+  body: Joi.object().keys({
+    username: Joi.string().required().alphanum().min(3).max(100),
+    password: Joi.string().required().min(3).max(255),
+    firstName: Joi.string().required().alphanum().min(3).max(100),
+    lastName: Joi.string().required().alphanum().min(3).max(100),
+    birthDate: Joi.date().required().max('now'),
+    email: Joi.string().email().required()
+  })
+}), async (req, res, next) => {
+  try {
+    const {username, password, firstName, lastName, birthDate, email} = req.body;
+    let user = await User.create({username, password, firstName, lastName, birthDate, email});
+    if (!user) throw new MyError(500, "User can't be created.");
+    let token = user.generateToken();
+    res.status(201).json({success: true, token});
+  } catch (e) {
+    next(e);
+  }
+
+
+});
+
+
+router.post('/login', celebrate({
+  body: Joi.object().keys({
+    username: Joi.string().required(),
+    password: Joi.string().required()
+  })
+}), async (req, res, next) => {
+  try {
+    const {username, password} = req.body;
+    let user = await User.findOne({username});
+    if (!user) throw new MyError(404, `The user with username "${username}" is not found.`);
+    let match = await user.comparePassword(password);
+    if (!match) throw new MyError(403, 'The password you have entered is incorrect.');
+    const token = user.generateToken();
+    res.json({success: true, token});
+  } catch (e) {
+    next(e);
+  }
+
+});
+router.get('/protected', ensureToken, (req, res) => {
+  res.status(200).json({success: true, data: req.decoded});
+});
+router.use(errors());
+module.exports = router;
