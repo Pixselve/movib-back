@@ -5,12 +5,23 @@
     "sourceMap": true,
     "rootDir": "./src",
     "outDir": "./dist",
-    "types": ["./global.d.ts", "node"],
-    "lib": ["es2015"],
+    "types": [
+      "./global.d.ts",
+      "node"
+    ],
+    "lib": [
+      "es2015"
+    ],
     "baseUrl": "dist",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "paths": {
-      "@models/*": ["models/*"],
-      "@root/*": ["./*"]
+      "@models/*": [
+        "models/*"
+      ],
+      "@root/*": [
+        "./*"
+      ]
     }
   },
   "exclude": [

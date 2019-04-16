@@ -1,9 +1,12 @@
-const router = require("express").Router();
+import {Router} from "express";
+
+const router = Router();
 
 router.use('/', require('./login'));
 router.use("/discover", require("./discover"));
 router.use("/genres", require("./genres"));
 router.use("/movies", require("./movies"));
+router.use('/science', require('./science'));
 
 
-module.exports = router;
+export default router;

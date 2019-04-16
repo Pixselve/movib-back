@@ -1,5 +1,5 @@
 const router = require("express").Router();
-import {celebrate, errors, Joi} from "celebrate";
+import {celebrate, Joi} from "celebrate";
 
 import {ensureToken} from '@root/controllers/authentification';
 import {MyError} from "@root/classes/MyError";
@@ -47,10 +47,16 @@ router.post('/login', celebrate({
   } catch (e) {
     next(e);
   }
-
 });
-router.get('/protected', ensureToken, (req, res) => {
-  res.status(200).json({success: true, data: req.decoded});
+router.get('/protected', ensureToken, async (req, res, next) => {
+  try {
+    const username = req.decoded.username;
+    const user = User.findOne({username});
+    if (!user) throw new MyError(404, 'User not found.');
+    let {firstName, lastName} = user;
+    res.status(200).json({success: true, data: {username, firstName, lastName}});
+  } catch (e) {
+    next(e);
+  }
 });
-router.use(errors());
 module.exports = router;

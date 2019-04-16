@@ -1,18 +1,19 @@
-const dotENV = require('dotenv').config({path: "../.env"});
+import * as mongoose from "mongoose";
+import * as moment from "moment";
+import * as express from "express";
+import * as cors from "cors";
+import * as bodyParser from "body-parser";
+import chalk from 'chalk';
+import {config} from "dotenv";
+
+require("module-alias/register");
+
+import router from "./routes";
+
+const dotENV = config({path: "../.env"});
 if (dotENV.error) {
   throw dotENV.error;
 }
-require("module-alias/register");
-
-
-const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
-const colors = require("colors");
-const bodyParser = require('body-parser');
-import * as moment from "moment";
-
-
 moment.locale("fr");
 
 const app = express();
@@ -20,7 +21,6 @@ const port = process.env.PORT;
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-const router = require("./routes");
 app.use("/", router);
 
 mongoose
@@ -30,15 +30,16 @@ mongoose
   )
   .then(res => {
     console.log(
-      colors.bgBlack(moment().format("L - LT")),
-      "✔  Connected to the database.".white.bgGreen
+      chalk.bgWhite.black(moment().format("L - LT")),
+      chalk.bgGreen.white("✔  Connected to the database.")
     );
     app.listen(port, () =>
       console.log(
-        colors.bgBlack(moment().format("L - LT")),
-        `✔  Server started and listening to port ${port}`.white.bgGreen
+        chalk.bgWhite.black(moment().format("L - LT")),
+        chalk.bgGreen.white(`✔  Server started and listening to port ${port}.`)
       )
     );
   })
   .catch(err => {
+    console.log(chalk.bgWhite.black(moment().format("L - LT")), chalk.bgRed.black("Unable to connect to the database."));
   });

@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 
 export const ensureToken = (req, res, next) => {
   const bearerHeader = req.headers['authorization'] || req.headers['x-access-token'];
