@@ -1,7 +1,7 @@
 import {Router} from "express";
 
 const router = Router();
-import {MyError} from "@root/classes/MyError";
+import {MyError} from "../classes/MyError";
 import {MongoError} from "mongodb";
 import {errors} from "celebrate";
 
@@ -15,13 +15,13 @@ router.get('*', function (req, res, next) {
 router.use(errors());
 router.use((err, req, res, next) => {
   if (err instanceof MongoError) {
-    return res.status(503).json({error: {status: 503, message: err.message}});
+    return res.status(400).json({error: {status: 503, message: err.message}});
   } else {
     next(err);
   }
 });
 router.use((err, req, res, next) => {
   const {status, message} = err;
-  res.status(status || 500).json({error: {status, message}});
+  res.status(status || 400).json({error: {status, message}});
 });
 export default router;

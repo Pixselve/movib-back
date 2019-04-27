@@ -6,7 +6,6 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "types": [
-      "./global.d.ts",
       "node"
     ],
     "lib": [

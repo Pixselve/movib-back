@@ -17,7 +17,7 @@ class Image {
   color: String;
 }
 
-class Movie extends Typegoose {
+export class Movie extends Typegoose {
   @prop({required: true, unique: true})
   tmdbId: Number;
   @prop({required: true, unique: true})
@@ -39,7 +39,6 @@ class Movie extends Typegoose {
 
   @staticMethod
   static async findOrCreate(this: ModelType<Movie> & typeof Movie, tmdbId: Number) {
-
     try {
       let movie = await this.findOne({tmdbId});
       if (!movie) {
@@ -67,7 +66,7 @@ class Movie extends Typegoose {
 
 const getMovieDataFromApi = async (tmdbId: Number) => {
   try {
-    const responseMovie = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}`);
+    const responseMovie = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=fr-FR&region=FR`);
     if (!responseMovie.ok) throw new Error("Unable to get the movie data from the api.");
     return await responseMovie.json();
   } catch (e) {

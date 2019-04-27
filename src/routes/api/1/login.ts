@@ -1,9 +1,9 @@
 const router = require("express").Router();
 import {celebrate, Joi} from "celebrate";
 
-import {ensureToken} from '@root/controllers/authentification';
-import {MyError} from "@root/classes/MyError";
-import User from '@models/User';
+import {ensureToken} from '../../../controllers/authentification';
+import {MyError} from "../../../classes/MyError";
+import User from '../../../models/User';
 
 
 router.post('/register', celebrate({
@@ -38,7 +38,7 @@ router.post('/login', celebrate({
 }), async (req, res, next) => {
   try {
     const {username, password} = req.body;
-    let user = await User.findOne({username});
+    let user = await User.findOne({username: username.toLowerCase()});
     if (!user) throw new MyError(404, `The user with username "${username}" is not found.`);
     let match = await user.comparePassword(password);
     if (!match) throw new MyError(403, 'The password you have entered is incorrect.');
@@ -50,10 +50,9 @@ router.post('/login', celebrate({
 });
 router.get('/protected', ensureToken, async (req, res, next) => {
   try {
-    const username = req.decoded.username;
-    const user = User.findOne({username});
+    const user = req.user;
     if (!user) throw new MyError(404, 'User not found.');
-    let {firstName, lastName} = user;
+    let {firstName, lastName, username} = user;
     res.status(200).json({success: true, data: {username, firstName, lastName}});
   } catch (e) {
     next(e);

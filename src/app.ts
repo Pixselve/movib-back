@@ -10,14 +10,15 @@ require("module-alias/register");
 
 import router from "./routes";
 
-const dotENV = config({path: "../.env"});
+const dotENV = config({path: `${__dirname}/.env`});
 if (dotENV.error) {
   throw dotENV.error;
 }
 moment.locale("fr");
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 3001;
+const host = process.env.HOST || '0.0.0.0';
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -33,7 +34,8 @@ mongoose
       chalk.bgWhite.black(moment().format("L - LT")),
       chalk.bgGreen.white("✔  Connected to the database.")
     );
-    app.listen(port, () =>
+    // @ts-ignore
+    app.listen(port, host, () =>
       console.log(
         chalk.bgWhite.black(moment().format("L - LT")),
         chalk.bgGreen.white(`✔  Server started and listening to port ${port}.`)

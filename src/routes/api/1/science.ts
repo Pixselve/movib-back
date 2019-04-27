@@ -1,9 +1,9 @@
 import User from "../../../models/User";
 
 const router = require("express").Router();
-import {ensureToken} from '@root/controllers/authentification';
+import {ensureToken} from '../../../controllers/authentification';
 import {celebrate, Joi} from "celebrate";
-import {MyError} from "@root/classes/MyError";
+import {MyError} from "../../../classes/MyError";
 
 
 router.post('/', ensureToken, celebrate({

@@ -1,7 +1,9 @@
-const router = require("express").Router();
-const fetch = require("node-fetch");
-const mongoose = require("mongoose");
-import Genre from "@models/Genres"
+import fetch from "node-fetch";
+
+const router = Router();
+import Genre from "../../../models/Genres";
+
+import {Router} from "express";
 
 router.get("/update", async (req, res) => {
   try {
