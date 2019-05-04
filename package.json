@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "start": "node dist/app.js",
-    "dev": "cd ./dist && nodemon app.js ",
+    "dev": "nodemon dist/app.js",
     "build": "tsc"
   },
   "author": "",
@@ -24,7 +24,8 @@
     "jsonwebtoken": "^8.5.1",
     "body-parser": "^1.18.3",
     "bcryptjs": "^2.4.3",
-    "typegoose": "^5.6.0"
+    "typegoose": "^5.6.0",
+    "axios": "^0.18.0"
   },
   "devDependencies": {
     "@types/node": "^11.13.4",

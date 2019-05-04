@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import axios from "axios";
 import * as getColor from "get-image-colors";
 
 import {arrayProp, ModelType, prop, staticMethod, Typegoose} from 'typegoose';
@@ -11,25 +11,25 @@ class Genre {
 }
 
 class Image {
-  @prop({required: true})
-  path: String;
-  @prop({required: true})
-  color: String;
+  @prop()
+  path?: String;
+  @prop()
+  color?: String;
 }
 
 export class Movie extends Typegoose {
   @prop({required: true, unique: true})
   tmdbId: Number;
-  @prop({required: true, unique: true})
+  @prop({unique: true})
   imdbId: String;
   @prop({required: true})
   title: String;
-  @prop({required: true})
-  releaseDate: Date;
+  @prop()
+  releaseDate?: Date;
   @prop({required: true})
   originalLanguage: String;
-  @prop({required: true})
-  plot: String;
+  @prop()
+  plot?: String;
   @arrayProp({items: Genre})
   genres: Genre[];
   @prop({required: true})
@@ -43,7 +43,18 @@ export class Movie extends Typegoose {
       let movie = await this.findOne({tmdbId});
       if (!movie) {
         const {backdrop_path, genres, imdb_id: imdbId, original_language: originalLanguage, overview: plot, poster_path, release_date: releaseDate, title} = await getMovieDataFromApi(tmdbId);
-        const [backdropColor, posterColor] = await Promise.all([await getImageColor(`https://image.tmdb.org/t/p/w300/${backdrop_path}`), await getImageColor(`https://image.tmdb.org/t/p/w92/${poster_path}`)]);
+        let colorArr = [];
+        if (backdrop_path) {
+          colorArr.push(await getImageColor(`https://image.tmdb.org/t/p/w300/${backdrop_path}`));
+        } else {
+          colorArr.push(null);
+        }
+        if (poster_path) {
+          colorArr.push(await getImageColor(`https://image.tmdb.org/t/p/w92/${poster_path}`));
+        } else {
+          colorArr.push(null);
+        }
+        const [backdropColor, posterColor] = await Promise.all(colorArr);
         movie = await this.create({
           title,
           imdbId,
@@ -66,9 +77,14 @@ export class Movie extends Typegoose {
 
 const getMovieDataFromApi = async (tmdbId: Number) => {
   try {
-    const responseMovie = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=fr-FR&region=FR`);
-    if (!responseMovie.ok) throw new Error("Unable to get the movie data from the api.");
-    return await responseMovie.json();
+    const responseMovie = await axios.get(`https://api.themoviedb.org/3/movie/${tmdbId}`, {
+      params: {
+        api_key: process.env.TMDB_API_KEY,
+        language: "fr",
+        region: "FR"
+      }
+    });
+    return responseMovie.data;
   } catch (e) {
     throw e;
   }

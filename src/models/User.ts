@@ -5,8 +5,6 @@ import MovieInteraction from './MovieInteraction';
 import {arrayProp, instanceMethod, prop, pre, Typegoose} from 'typegoose';
 
 
-
-
 class Interaction {
   @prop()
   action: String;
@@ -85,6 +83,16 @@ export class User extends Typegoose {
     }
   }
 
+  @instanceMethod
+  // @ts-ignore
+  async getLibrary(this: InstanceType<User>) {
+    try {
+      const data = await MovieInteraction.find({user: this._id, followed: true}).populate("movie");
+      return data;
+    } catch (e) {
+      throw e;
+    }
+  }
 
 }
 

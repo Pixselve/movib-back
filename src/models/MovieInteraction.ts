@@ -1,7 +1,7 @@
 import {ModelType, prop, Ref, staticMethod, Typegoose} from 'typegoose';
 import {User} from './User';
-import {Movie as MovieSchema} from './Movie';
-import Movie from './Movie';
+import Movie, {Movie as MovieSchema} from './Movie';
+import axios from "axios";
 
 export class MovieInteraction extends Typegoose {
   @prop({ref: User, required: true})
@@ -21,10 +21,10 @@ export class MovieInteraction extends Typegoose {
 
 
     const interaction = await this.findOneAndUpdate({user: userId, movie: movieId}, {
-      watched,
-      followed,
-      rating
-    },
+        watched,
+        followed,
+        rating
+      },
       // @ts-ignore
       {omitUndefined: true, new: true});
     return interaction;
@@ -51,7 +51,45 @@ export class MovieInteraction extends Typegoose {
     } catch (e) {
       throw e;
     }
+  }
 
+  @staticMethod
+  static async search(this: ModelType<MovieInteraction> & typeof MovieInteraction, userId: String, query: { q?: string, year?: number }) {
+    try {
+      const {q, year} = query;
+      const response = await axios.get(`https://api.themoviedb.org/3/search/movie`, {
+        params: {
+          api_key: process.env.TMDB_API_KEY,
+          language: "fr",
+          region: "FR",
+          query: q,
+          primary_release_year: year
+        }
+      });
+      return await Promise.all(response.data.results.map(movie => this.findOrCreate(userId, movie.id)));
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  @staticMethod
+  static async discover(this: ModelType<MovieInteraction> & typeof MovieInteraction, userId: String, data: { genres: number[], lang: string, year: number }) {
+    try {
+      const {genres, lang, year} = data;
+      const response = await axios.get(`https://api.themoviedb.org/3/discover/movie`, {
+        params: {
+          api_key: process.env.TMDB_API_KEY,
+          language: "fr",
+          region: "FR",
+          with_genres: genres,
+          primary_release_year: year,
+          with_original_language: lang
+        }
+      });
+      return await Promise.all(response.data.results.map(movie => this.findOrCreate(userId, movie.id)));
+    } catch (e) {
+      throw e;
+    }
   }
 }
 
