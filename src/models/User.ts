@@ -1,8 +1,8 @@
 import * as bcrypt from "bcryptjs";
 import * as jwt from "jsonwebtoken";
-import fetch from 'node-fetch';
 import MovieInteraction from './MovieInteraction';
 import {arrayProp, instanceMethod, prop, pre, Typegoose} from 'typegoose';
+import axios from "axios";
 
 
 class Interaction {
@@ -66,15 +66,23 @@ export class User extends Typegoose {
       const lastActivity = this.lastInteraction;
       let ids;
       if (lastActivity) {
-        const response = await fetch(`https://api.themoviedb.org/3/movie/${lastActivity.tmdbId}/recommendations?api_key=${process.env.TMDB_API_KEY}&language=fr-FR&region=FR`);
-        if (!response.ok) throw new Error("Unable to fetch the data.");
-        const json = await response.json();
-        ids = json.results.map(el => el.id);
+        const json = await axios.get(`https://api.themoviedb.org/3/movie/${lastActivity.tmdbId}/recommendations`, {
+          params: {
+            api_key: process.env.TMDB_API_KEY,
+            language: "fr",
+            region: "FR",
+          }
+        });
+        ids = json.data.results.map(el => el.id);
       } else {
-        const response = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${process.env.TMDB_API_KEY}&language=fr-FR&region=FR`);
-        if (!response.ok) throw new Error("Unable to fetch the data.");
-        const json = await response.json();
-        ids = json.results.map(el => el.id);
+        const json = await axios.get(`https://api.themoviedb.org/3/discover/movie`, {
+          params: {
+            api_key: process.env.TMDB_API_KEY,
+            language: "fr",
+            region: "FR",
+          }
+        });
+        ids = json.data.results.map(el => el.id);
       }
       ids = ids.slice(0, limit);
       return await Promise.all(ids.map(id => MovieInteraction.findOrCreate(this._id, id)));
