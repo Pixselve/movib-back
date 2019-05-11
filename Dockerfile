@@ -1,11 +1,11 @@
-# First stage
+# Première étape, compilation de Typescript
 FROM node:10-alpine
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npm run build
-# Second stage
+# Deuxième étape, lance l'application
 FROM node:10-alpine
 WORKDIR /usr/src/app
 COPY package*.json ./

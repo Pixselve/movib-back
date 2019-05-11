@@ -29,4 +29,4 @@ router.post('/', ensureToken, celebrate({
 });
 
 
-module.exports = router;
+export default router;

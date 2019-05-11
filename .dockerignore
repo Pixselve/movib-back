@@ -1,5 +1,5 @@
 node_modules
 .gitignore
-Dockerfile
 .dockerignore
 dist
+api-doc

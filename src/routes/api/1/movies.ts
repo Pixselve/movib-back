@@ -202,14 +202,26 @@ router.get("/", ensureToken, async (req, res, next) => {
  */
 router.get('/recommendations', ensureToken, celebrate({
   query: Joi.object().keys({
-    limit: Joi.number().max(10).min(1)
+    limit: Joi.number().max(10).min(1),
+    content: Joi.string()
   })
 }), async (req, res, next) => {
   try {
-    const {limit} = req.query;
+    const {limit, content} = req.query;
     const user = req.user;
-    const data = await user.getMovieRecommendations(limit || 10);
-    res.status(200).json(data);
+    if (content === "no-seen-library") {
+      const data = await user.getNoSeenLibrary(limit || 10);
+      res.status(200).json(data);
+    } else if (content === "last-followed") {
+      const data = await user.lastFollowed(limit || 10);
+      res.status(200).json(data);
+    } else if (content === "new") {
+      const data = await user.newMovies(limit || 10);
+      res.status(200).json(data);
+    } else {
+      const data = await user.getMovieRecommendations(limit || 10);
+      res.status(200).json(data);
+    }
   } catch (e) {
     next(e);
   }
@@ -643,4 +655,4 @@ router.post('/:id/update', ensureToken, celebrate({
 });
 
 
-module.exports = router;
+export default router;
