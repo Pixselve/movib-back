@@ -14,7 +14,7 @@
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "module-alias": "^2.2.0",
-    "mongoose": "^5.4.19",
+    "mongoose": "^5.7.5",
     "chalk": "^2.4.2",
     "moment": "^2.24.0",
     "get-image-colors": "^2.0.0",
